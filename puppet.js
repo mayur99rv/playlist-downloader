@@ -38,7 +38,7 @@ async function run() {
     hrefs: newhrefs,
     url: configFile.url,
   };
-  //   console.log(newhrefs);
+
   fs.writeFileSync("./config2.json", JSON.stringify(obj), "utf-8");
   for (let i = 0; i < newhrefs.length; i++) {
     try {
@@ -54,30 +54,76 @@ async function run() {
       await newPage.waitForSelector("button#sf_submit");
       await newPage.click("button#sf_submit");
 
-      await newPage.waitForTimeout(4000);
+      await newPage.waitForTimeout(2000);
       await newPage._client.send("Page.setDownloadBehavior", {
         behavior: "allow",
         downloadPath: path.resolve("E:", "playlist_downloader", title),
       });
 
-      await newPage.waitForTimeout(1000);
-      await newPage.waitForSelector("a.link-download");
-      await newPage.click("a.link-download");
-      await newPage.waitForTimeout(1000);
+      await newPage.waitForTimeout(3000);
 
+      await newPage.waitForSelector("a.link-download");
+      let downlink = await newPage.evaluate(() =>
+        Array.from(
+          document.querySelectorAll(
+            "#sf_result > div > div.result-box.video > div.info-box > div.link-box > div.def-btn-box > a"
+          ),
+          (a) => {
+            return a.getAttribute("href");
+          }
+        )
+      );
+      // console.log(downlink[0]);
+      let s = downlink[0];
+      let index = s.search("title=");
+      var output = [
+        s.slice(0, index + 6),
+        i + 1 + "%20",
+        s.slice(index + 6),
+      ].join("");
+
+      try {
+        await newPage.goto(output);
+      } catch (err) {
+        // console.log(err);
+      } finally {
+        console.log("done");
+      }
+
+      // console.log(output);
+      // await newPage.waitForTimeout(1000);
+
+      // await newPage.close();
+      // let page2 = await browser.newPage();
+      // await page2._client.send("Page.setDownloadBehavior", {
+      //   behavior: "allow",
+      //   downloadPath: path.resolve("E:", "playlist_downloader", title),
+      // });
+      // await page2.goto(output, {
+      //   waitUntil: "domcontentloaded",
+      // });
       let length = await (await browser.pages()).length;
       let npages = await browser.pages();
       console.log(length);
+
       if (length > 2) {
         for (let k = length - 1; k > 0; k--) await npages[k].close();
       } else if (length === 2) {
         await npages[1].close();
       }
     } catch (e) {
-      console.log(e);
-      i = i - 1;
+      // console.log(e);
+      let length = await (await browser.pages()).length;
+      let npages = await browser.pages();
+      // console.log(length);
+
+      if (length > 2) {
+        for (let k = length - 1; k > 0; k--) await npages[k].close();
+      } else if (length === 2) {
+        await npages[1].close();
+      }
+      // i = i - 1;
     }
   }
-  //   await newPage.close();
 }
 run();
