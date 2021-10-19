@@ -6,8 +6,8 @@ youtube playlist downloader \
 // if you donot have E: drive, then change the location in puppet.js to C: or D:
 
 To initiate :
-// run this only once \
+// run this only once 
 > npm install
 
-to run script : \
+to run script : 
 > node puppet
