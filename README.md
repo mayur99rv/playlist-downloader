@@ -1,5 +1,5 @@
 # playlist-downloader
-youtube playlist downloader \
+youtube playlist videos downloader \
 \
 **Before running the script, ensure that you've updated the url of playlist in config.json** \
 \
